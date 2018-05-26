@@ -1,0 +1,23 @@
+<div style='width: 800px;'>  
+  <div id="map" style='width: 800px; height: 400px;'></div>  
+</div>  
+
+<script type="text/javascript">  
+
+handler = Gmaps.build('Google');  
+handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){  
+  markers = handler.addMarkers([  
+    {  
+      "lat": -33.447,  
+      "lng": -70.67,  
+      "picture": {  
+        "width":  32,  
+        "height": 32  
+      },  
+      "infowindow": "Posición del avión"  
+    }  
+  ]);  
+  handler.bounds.extendWith(markers);  
+  handler.fitMapToBounds();  
+});  
+</script>
