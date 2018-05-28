@@ -1,23 +1,36 @@
-<div style='width: 800px;'>  
-  <div id="map" style='width: 800px; height: 400px;'></div>  
-</div>  
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+       }
+    </style>
+  </head>
+  <body>
+    <h3>Tarea 3 BZ</h3>
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var santiago = {lat: -33.447487, lng: -70.673676};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: santiago
+        });
+        var image_avion = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Airplane-logo.png/25px-Airplane-logo.png';
+        var marker = new google.maps.Marker({
+          position: santiago,
+          map: map,
+          icon: image_avion
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAb9M0nNrwGqV7C3v3A8n8POr1u6I-8sw&callback=initMap">
+    </script>
+  </body>
+</html>
 
-<script type="text/javascript">  
 
-handler = Gmaps.build('Google');  
-handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){  
-  markers = handler.addMarkers([  
-    {  
-      "lat": -33.447,  
-      "lng": -70.67,  
-      "picture": {  
-        "width":  32,  
-        "height": 32  
-      },  
-      "infowindow": "Posición del avión"  
-    }  
-  ]);  
-  handler.bounds.extendWith(markers);  
-  handler.fitMapToBounds();  
-});  
-</script>
+
