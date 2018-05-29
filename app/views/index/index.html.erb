@@ -45,6 +45,7 @@
         //map: map,
         //icon: image_plane
         //});
+        //conexión con los aeropuertos del profe
         var airports = {};
         airport_pos = {};
         socket.emit('AIRPORTS');
@@ -56,7 +57,18 @@
                 map: map,
                 icon: image_airport
             });
-          //conexión con los aeropuertos del profe
+          };
+        var flights = {};
+        plane_pos = {};
+        socket.emit('FLIGHTS');
+        socket.on('FLIGHTS',(flight) => {
+          for(var i in flight) {
+            flights[i]=flight[i];
+            airport_pos[i]=new google.maps.Marker({
+                position: {lat: airports[i]['airport_position'][0], lng: airports[i]['airport_position'][1]},
+                map: map,
+                icon: image_airport
+            });
           };
 
         });
