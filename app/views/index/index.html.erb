@@ -100,6 +100,7 @@
           for(var i in flight) {
             planes[i]=flight[i];
             planes[i]['position']=[];
+            contentFlight=(`<h3>Avión ${i} </h3><p>Vuelo ${planes[i]['code']}<p>Aerolinea ${planes[i]['airline']}<p>${planes[i]['plane']}<p>${planes[i]['seats']} Asientos<p>Vuelo desde ${planes[i]['origin']['name']} [${planes[i]['origin']['airport_code']} - ${planes[i]['origin']['country_code']}] <p>Vuelo hacia ${planes[i]['destination']['name']} [${planes[i]['destination']['airport_code']} - ${planes[i]['destination']['country_code']}] `);
             new google.maps.Polyline({
               path: [
                 new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
@@ -126,12 +127,14 @@
             var plane_pos = new google.maps.Marker({
               position: new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
               map: map,
-              icon: image_plane  
+              icon: image_plane ,
+              html: contentFlight 
             });
+
             coord[i]=plane_pos;
-            plane_pos.addListener('click', function() {
-              infowindow.setContent(`<h3>Avión ${i} </h3><p>Vuelo ${planes[i]['code']}<p>Aerolinea ${planes[i]['airline']}<p>${planes[i]['plane']}<p>${planes[i]['seats']} Asientos<p>Vuelo desde ${planes[i]['origin']['name']} [${planes[i]['origin']['airport_code']} - ${planes[i]['origin']['country_code']}] <p>Vuelo hacia ${planes[i]['destination']['name']} [${planes[i]['destination']['airport_code']} - ${planes[i]['destination']['country_code']}] `);
-              infowindow.open(map, plane_pos);
+            google.maps.event.addListener(plane_pos, 'click', function() {
+              infowindow.setContent(this.html);
+              infowindow.open(map, this);
             });
 
         };
