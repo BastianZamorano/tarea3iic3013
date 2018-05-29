@@ -84,11 +84,11 @@
                 position: {lat: airport[i]['airport_position'][0], lng: airport[i]['airport_position'][1]},
                 map: map,
                 icon: image_airport,
-                html: contentAirport
+                content: contentAirport
               })
           
             google.maps.event.addListener(airport_pos, 'click', function() {
-                infowindow.setContent(this.html);
+                infowindow.setContent(this.content);
                 infowindow.open(map, this);  
             });
           };
@@ -128,12 +128,12 @@
               position: new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
               map: map,
               icon: image_plane ,
-              html: contentFlight 
+              content: contentFlight 
             });
 
             coord[i]=plane_pos;
             google.maps.event.addListener(plane_pos, 'click', function() {
-              infowindow.setContent(this.html);
+              infowindow.setContent(this.content);
               infowindow.open(map, this);
             });
 
