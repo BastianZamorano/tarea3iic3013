@@ -58,7 +58,6 @@
         var flights = {};
         airport_pos = {};
         movement_planes = {};
-        mov = {};
         var planes = {};
         var coord = {};
         var image_plane = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Airplane-logo.png/25px-Airplane-logo.png';
@@ -66,8 +65,7 @@
         url: 'https://cdn1.iconfinder.com/data/icons/airport-set-1/512/8-512.png', 
         scaledSize: new google.maps.Size(22, 32),     
         };
-        var infoAirport = [];
-        var infoAirplane = [];
+        
         
 
 
@@ -87,19 +85,17 @@
         socket.emit('AIRPORTS');
         socket.on('AIRPORTS',(airport) => {
           for(var i in airport) {
-            airports[i]=airport[i]['airport_position'];
+            airports[i]=airport[i];
             var airport_pos=new google.maps.Marker({
                 position: {lat: airport[i]['airport_position'][0], lng: airport[i]['airport_position'][1]},
                 map: map,
                 icon: image_airport
-              });
-
+              })
             airport_pos.addListener('click', function() {
-            infowindow.setContent(`<h3>Aeropuerto</h3>${i}<p>${airport[i]['city']}<p>${airport[i]['country']}`);
-            infowindow.open(map, airport_pos);
+              infowindow.setContent(`<h3>Aeropuerto</h3>${i}<p>${airport[i]['city']}<p>${airport[i]['country']}`);
+              infowindow.open(map, airport_pos);
             });
-
-            };
+          };
          });
 
        
@@ -135,8 +131,13 @@
               position: new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
               map: map,
               icon: image_plane  
-          });
-          coord[i]=plane_pos;
+            });
+            coord[i]=plane_pos;
+
+            plane_pos.addListener('click', function() {
+              infowindow.setContent(`<h3>Avión ${i} </h3><p>Vuelo ${planes[i]['code']}<p>Aerolinea ${planes[i]['airline']}<p>${planes[i]['plane']}<p>${planes[i]['seats']} Asientos <p>Coord ${planes[i]['origin']['airport_position'][0]}`);
+              infowindow.open(map, plane_pos);
+            });
 
         };
       });
