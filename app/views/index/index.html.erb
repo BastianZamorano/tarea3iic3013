@@ -42,11 +42,7 @@
          var infowindow = new google.maps.InfoWindow({
                content: 'contentString',
           });
-           
-
-      var infowindow = new google.maps.InfoWindow({
-        content: 'contentString',
-        });
+          
         //var marker = new google.maps.Marker({
         //position: santiago,
         //map: map,
@@ -83,15 +79,17 @@
         socket.on('AIRPORTS',(airport) => {
           for(var i in airport) {
             airports[i]=airport[i];
+            contentAirport = (`<h3>Aeropuerto</h3>${i}<p>${airport[i]['city']}<p>${airport[i]['country']}`);
             var airport_pos=new google.maps.Marker({
                 position: {lat: airport[i]['airport_position'][0], lng: airport[i]['airport_position'][1]},
                 map: map,
-                icon: image_airport
+                icon: image_airport,
+                html: contentAirport
               })
-            
-            airport_pos.addListener('click', function() {
-              infowindow.setContent(`<h3>Aeropuerto</h3>${i}<p>${airport[i]['city']}<p>${airport[i]['country']}`);
-              infowindow.open(map, airport_pos);
+          
+            google.maps.event.addListener(airport_pos, 'click', function() {
+                infowindow.setContent(this.html);
+                infowindow.open(map, this);  
             });
           };
          });
