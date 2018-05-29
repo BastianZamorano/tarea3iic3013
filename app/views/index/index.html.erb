@@ -28,15 +28,7 @@
       );
 
     socket.on('connect', () => console.log('CONNECTED'));
-
-    function information(airport, flight, plane) {
-      var contentAirport = '<div id="content">'+
-                            '<div id="siteNotice">'+
-                            '</div>'+ '<h1>' + airport[i]['name'] + '</h1>' + '<p>' + airport[i]['code'] + '</p>' + 
-                            '<p>' + airport[i]['city'] + '</p>' + '<p>' + airport[i]['country'] + 
-                            '</p>' + '<p>' + airport[i]['airport_position'] + "," + airport.airport_position[1] 
-                            + '</p>' + '</div>'+ '</div>';
-    }
+    
 
       function initMap() {
         var santiago = {lat: -33.447487, lng: -70.673676};
@@ -61,7 +53,14 @@
         //conexión con los aeropuertos del profe
 
         var airports = {};
+        var flights = {};
         airport_pos = {};
+        movement_planes = {};
+        mov = {};
+        var planes = {};
+        var coord = {};
+
+
         socket.emit('AIRPORTS');
         socket.on('AIRPORTS',(airport) => {
           for(var i in airport) {
@@ -71,17 +70,20 @@
                 map: map,
                 icon: image_airport
               });
+            
             };
          });
-        var flights = {};
+
+       
         socket.emit('FLIGHTS');
         socket.on('FLIGHTS',(flight) => {
           for(var i in flight) {
-            flights[i]=flight[i];
+            planes[i]=flight[i];
+            planes[i]['position']=[];
             new google.maps.Polyline({
               path: [
-                new google.maps.LatLng(flights[i]['origin']['airport_position'][0], flights[i]['origin']['airport_position'][1]),
-                new google.maps.LatLng(flights[i]['destination']['airport_position'][0], flights[i]['destination']['airport_position'][1])
+                new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
+                new google.maps.LatLng(planes[i]['destination']['airport_position'][0], planes[i]['destination']['airport_position'][1])
               ],
               geodesic: true,
               strokeColor: '#FF00FF',
@@ -89,31 +91,39 @@
               strokeWeight: 2.5,
               map: map
             });
-          };
-        });
-        var planes = {};
-        var coord = {};
+
+            var road = new google.maps.Polyline({
+              path: [
+                new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
+              ],
+              geodesic: true,
+              strokeColor: '#8B4513',
+              strokeOpacity: 2.0,
+              strokeWeight: 2.5,
+              map: map 
+            });
+            movement_planes[planes[i]['code']] = road;
+            var marker = new google.maps.Marker({
+              position: new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
+              map: map,
+              icon: image_plane  
+          });
+          coord[i]=marker;
+        };
+      });
+  
         socket.on('POSITION',(position) => {
-          for(var i in planes) {
+          for (var i in planes) {
             if(planes[i]['code'] == position['code']) {
               mapa = new google.maps.LatLng(position['position'][0],position['position'][1]);
               planes[i]['position'].push(mapa);
               coord[i].setPosition(mapa);
-    
-            var movement_planes = new google.maps.Marker ({
-              position: mapa,
-              map: map,
-              icon: image_plane
-             })
+              movement_planes[position['code']].setPath(planes[i]['position']);
+             }
             };
-          };
-        });
-      }
+          });
+      };
     </script>
-
-
-
-
 
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAb9M0nNrwGqV7C3v3A8n8POr1u6I-8sw&callback=initMap">
