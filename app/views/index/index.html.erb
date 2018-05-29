@@ -28,28 +28,30 @@
       );
 
     socket.on('connect', () => console.log('CONNECTED'));
-    
 
+    //creación del mapa    
+    
       function initMap() {
         var santiago = {lat: -33.447487, lng: -70.673676};
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 4,
           center: santiago
         });
-        var image_plane = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Airplane-logo.png/25px-Airplane-logo.png';
-        var image_airport = {
-        url: 'https://cdn1.iconfinder.com/data/icons/airport-set-1/512/8-512.png', 
-        scaledSize: new google.maps.Size(22, 32),     
-        };
+
+ 
+         var infowindow = new google.maps.InfoWindow({
+               content: 'contentString',
+          });
+           
+
+      var infowindow = new google.maps.InfoWindow({
+        content: 'contentString',
+        });
         //var marker = new google.maps.Marker({
         //position: santiago,
         //map: map,
         //icon: image_plane
         //});
-
-      
-
-
         //conexión con los aeropuertos del profe
 
         var airports = {};
@@ -59,18 +61,44 @@
         mov = {};
         var planes = {};
         var coord = {};
+        var image_plane = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Airplane-logo.png/25px-Airplane-logo.png';
+        var image_airport = {
+        url: 'https://cdn1.iconfinder.com/data/icons/airport-set-1/512/8-512.png', 
+        scaledSize: new google.maps.Size(22, 32),     
+        };
+        var infoAirport = [];
+        var infoAirplane = [];
+        
+
+
+
+        socket.on('POSITION',(position) => {
+          for (var i in planes) {
+            if(planes[i]['code'] == position['code']) {
+              mapa = new google.maps.LatLng(position['position'][0],position['position'][1]);
+              planes[i]['position'].push(mapa);
+              coord[i].setPosition(mapa);
+              movement_planes[position['code']].setPath(planes[i]['position']);
+             }
+            };
+          });
 
 
         socket.emit('AIRPORTS');
         socket.on('AIRPORTS',(airport) => {
           for(var i in airport) {
-            airports[i]=airport[i];
-            airport_pos[i]=new google.maps.Marker({
-                position: {lat: airports[i]['airport_position'][0], lng: airports[i]['airport_position'][1]},
+            airports[i]=airport[i]['airport_position'];
+            var airport_pos=new google.maps.Marker({
+                position: {lat: airport[i]['airport_position'][0], lng: airport[i]['airport_position'][1]},
                 map: map,
                 icon: image_airport
               });
-            
+
+            airport_pos.addListener('click', function() {
+            infowindow.setContent(`<h3>Aeropuerto</h3>${i}<p>${airport[i]['city']}<p>${airport[i]['country']}`);
+            infowindow.open(map, airport_pos);
+            });
+
             };
          });
 
@@ -103,32 +131,21 @@
               map: map 
             });
             movement_planes[planes[i]['code']] = road;
-            var marker = new google.maps.Marker({
+            var plane_pos = new google.maps.Marker({
               position: new google.maps.LatLng(planes[i]['origin']['airport_position'][0], planes[i]['origin']['airport_position'][1]),
               map: map,
               icon: image_plane  
           });
-          coord[i]=marker;
+          coord[i]=plane_pos;
+
         };
       });
-  
-        socket.on('POSITION',(position) => {
-          for (var i in planes) {
-            if(planes[i]['code'] == position['code']) {
-              mapa = new google.maps.LatLng(position['position'][0],position['position'][1]);
-              planes[i]['position'].push(mapa);
-              coord[i].setPosition(mapa);
-              movement_planes[position['code']].setPath(planes[i]['position']);
-             }
-            };
-          });
       };
     </script>
 
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAb9M0nNrwGqV7C3v3A8n8POr1u6I-8sw&callback=initMap">
     </script>
-
   </body>
 </html>
 
