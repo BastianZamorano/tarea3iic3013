@@ -3,32 +3,74 @@
   <head>
     <style>
       #map {
-        height: 400px;
+        height: 500px;
         width: 100%;
        }
     </style>
   </head>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
   <body>
+
     <h3>Tarea 3 BZ</h3>
     <div id="map"></div>
+
     <script>
+    
+    var link = 'wss://integracion-tarea-3.herokuapp.com';
+    var socket = io(
+        link,
+        {
+          path: '/flights',
+          reconnect: true,
+          transports: ['websocket','polling']
+        }
+      );
+
+    socket.on('connect', () => console.log('CONNECTED'));
+
       function initMap() {
         var santiago = {lat: -33.447487, lng: -70.673676};
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 4,
           center: santiago
         });
-        var image_avion = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Airplane-logo.png/25px-Airplane-logo.png';
-        var marker = new google.maps.Marker({
-          position: santiago,
-          map: map,
-          icon: image_avion
+        var image_plane = 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Airplane-logo.png/25px-Airplane-logo.png';
+        var image_airport = {
+        url: 'https://cdn1.iconfinder.com/data/icons/airport-set-1/512/8-512.png', 
+        scaledSize: new google.maps.Size(22, 32),     
+        };
+        //var marker = new google.maps.Marker({
+        //position: santiago,
+        //map: map,
+        //icon: image_plane
+        //});
+        var airports = {};
+        airport_pos = {};
+        socket.emit('AIRPORTS');
+        socket.on('AIRPORTS',(airport) => {
+          for(var i in airport) {
+            airports[i]=airport[i];
+            airport_pos[i]=new google.maps.Marker({
+                position: {lat: airports[i]['airport_position'][0], lng: airports[i]['airport_position'][1]},
+                map: map,
+                icon: image_airport
+            });
+          //conexión con los aeropuertos del profe
+          };
+
         });
       }
     </script>
+
+
+
+
+
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAb9M0nNrwGqV7C3v3A8n8POr1u6I-8sw&callback=initMap">
     </script>
+
   </body>
 </html>
 
