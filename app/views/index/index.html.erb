@@ -67,9 +67,6 @@
         };
         
         
-
-
-
         socket.on('POSITION',(position) => {
           for (var i in planes) {
             if(planes[i]['code'] == position['code']) {
@@ -91,6 +88,7 @@
                 map: map,
                 icon: image_airport
               })
+            
             airport_pos.addListener('click', function() {
               infowindow.setContent(`<h3>Aeropuerto</h3>${i}<p>${airport[i]['city']}<p>${airport[i]['country']}`);
               infowindow.open(map, airport_pos);
@@ -133,9 +131,8 @@
               icon: image_plane  
             });
             coord[i]=plane_pos;
-
             plane_pos.addListener('click', function() {
-              infowindow.setContent(`<h3>Avión ${i} </h3><p>Vuelo ${planes[i]['code']}<p>Aerolinea ${planes[i]['airline']}<p>${planes[i]['plane']}<p>${planes[i]['seats']} Asientos <p>Coord ${planes[i]['origin']['airport_position'][0]}`);
+              infowindow.setContent(`<h3>Avión ${i} </h3><p>Vuelo ${planes[i]['code']}<p>Aerolinea ${planes[i]['airline']}<p>${planes[i]['plane']}<p>${planes[i]['seats']} Asientos<p>Vuelo desde ${planes[i]['origin']['name']} [${planes[i]['origin']['airport_code']} - ${planes[i]['origin']['country_code']}] <p>Vuelo hacia ${planes[i]['destination']['name']} [${planes[i]['destination']['airport_code']} - ${planes[i]['destination']['country_code']}] `);
               infowindow.open(map, plane_pos);
             });
 
