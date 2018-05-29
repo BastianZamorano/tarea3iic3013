@@ -12,7 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
   <body>
 
-    <h3>Tarea 3 BZ</h3>
+    <h3><center>Tarea 3 BZ</center></h3>
     <div id="map"></div>
 
     <script>
@@ -28,6 +28,15 @@
       );
 
     socket.on('connect', () => console.log('CONNECTED'));
+
+    function information(airport, flight, plane) {
+      var contentAirport = '<div id="content">'+
+                            '<div id="siteNotice">'+
+                            '</div>'+ '<h1>' + airport[i]['name'] + '</h1>' + '<p>' + airport[i]['code'] + '</p>' + 
+                            '<p>' + airport[i]['city'] + '</p>' + '<p>' + airport[i]['country'] + 
+                            '</p>' + '<p>' + airport[i]['airport_position'] + "," + airport.airport_position[1] 
+                            + '</p>' + '</div>'+ '</div>';
+    }
 
       function initMap() {
         var santiago = {lat: -33.447487, lng: -70.673676};
@@ -45,7 +54,12 @@
         //map: map,
         //icon: image_plane
         //});
+
+      
+
+
         //conexión con los aeropuertos del profe
+
         var airports = {};
         airport_pos = {};
         socket.emit('AIRPORTS');
@@ -56,21 +70,43 @@
                 position: {lat: airports[i]['airport_position'][0], lng: airports[i]['airport_position'][1]},
                 map: map,
                 icon: image_airport
-            });
-          };
+              });
+            };
+         });
         var flights = {};
-        plane_pos = {};
         socket.emit('FLIGHTS');
         socket.on('FLIGHTS',(flight) => {
           for(var i in flight) {
             flights[i]=flight[i];
-            airport_pos[i]=new google.maps.Marker({
-                position: {lat: airports[i]['airport_position'][0], lng: airports[i]['airport_position'][1]},
-                map: map,
-                icon: image_airport
+            new google.maps.Polyline({
+              path: [
+                new google.maps.LatLng(flights[i]['origin']['airport_position'][0], flights[i]['origin']['airport_position'][1]),
+                new google.maps.LatLng(flights[i]['destination']['airport_position'][0], flights[i]['destination']['airport_position'][1])
+              ],
+              geodesic: true,
+              strokeColor: '#FF00FF',
+              strokeOpacity: 2.0,
+              strokeWeight: 2.5,
+              map: map
             });
           };
-
+        });
+        var planes = {};
+        var coord = {};
+        socket.on('POSITION',(position) => {
+          for(var i in planes) {
+            if(planes[i]['code'] == position['code']) {
+              mapa = new google.maps.LatLng(position['position'][0],position['position'][1]);
+              planes[i]['position'].push(mapa);
+              coord[i].setPosition(mapa);
+    
+            var movement_planes = new google.maps.Marker ({
+              position: mapa,
+              map: map,
+              icon: image_plane
+             })
+            };
+          };
         });
       }
     </script>
